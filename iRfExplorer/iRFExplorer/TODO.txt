@@ -1,34 +1,80 @@
-
 Questions:
+
+----------------
 
 We have hardcoded the min frequency span setting to 112kHz (found on a WSUB1G)
     Any way to learn this ?
 
+A: This is documented in the specs of each model, see specs on the website and also check code in the C# app.
+All models under 1GHz band are limited to 112Khz span whereas the 2.4Ghz model is limited to 2MHz span.
+
+----------------
+
 When the device is in a menu mode as opposed to graph display mode - there is no output/response from the serial port. 
     So can we reliably detect/change mode ?
+
+A: Everytime there is a mode change (span, dBm, center freq, etc) the RF Explorer will send a new Current_Config message.
+As the device is not multitask, nothing is actually happening when the menu is open so there is no need to send anything
+to the serial port. However, if you have active Dump Screen the device will send screenshots anytime a menu screen is
+updated.
+
+----------------
 
 Current_Config
 
     Seems the frequency fields in setConfig are %07d and the dBms are %03d
         is that mandatory ?
 
+A: Yes this is fixed field length.
+
     It says size==30 bytes == but cmd string excluding #<len> is exactly 30 - so that makes <size> 32. 
 
+A: You are correct, <size> was not updated after a last minute field change. Fixed. Thanks for reporting.
+
     It says Freq_Step in the spec - but the code seems to use nEndKhz in UpdateRemoteConfigData()
+
+A: You are correct, fixed, thanks for reporting. It is actually freq_step from RFE->PC but End_Freq from PC->RFE.
+
+----------------
 
 Spectrum
     is the band from minFreq to minFreq-Span -- or is it centered around minFreq
 
+A: Communication PC<->RFE is always start-end freq span, the center is a calculated subproduct but never used in commands.
+
+----------------
+
 Numbers of samples in Spectrum
     We look at the byte just after $S. What is a sensible/acceptable range ?
+
+A: This is very open for the future modes RFE will support. You can expect something as low as 13 (for 13 wifi channels) and
+as high as 255.
+
+----------------
 
 Hardcoding of dBm range of -001 (max) to -120 (min) with 10dBm separation.
     Can we learn this somehow ?
     Is it the same for all devices ?
 
+A: This is the same practical limit for all devices. However, some devices may not go as low as -120dBm but still is a 
+good lower limit to use in the software.
+
+----------------
+
 On OSX
     Is the driver always called 'SLAB' ? So we can auto select that one if found and no prefs.
     CP210x Macintosh OSX VCP Driver v2.9 - May 17, 2011
+
+A: You may need to check what may happen if you have two SLAB devices connected. Silabs is used in many devices out there,
+so what the Windows PC client does is check if one (and only one) Silabs device is actually connected. If it is, then
+automatically link and try to bound to the device. However, if it finds 2 or more, then populates the combobox with available
+ports but doesn't try to connect as it assumes it may not be a RFExplorer device but something else.
+
+There are ways to mark the Silabs chip with an OEM ID we actually got approved for. However, Windows Vista and Windows 7 
+makes these drivers "unsigned" and that poses a lot of limitations. You can safely assume the driver will be presented
+as SLAB for the foreseable future.
+
+----------------
 
 TODO:
     fix die/stop/start of serial port (re)inserts.
