@@ -12,9 +12,14 @@ PROTOCOL WISHES
 -   Learn min dBm step and freq. span's ranges on the
     wire rather than hardcode. Extra #C reply perhaps.
     (Verions 1.02 will ignore unkn #..\r\n cleanly.)
+A: Probably a formal definition in the RS232 command wiki page may work for this, 
+otherwise it will take precious ROM for a marginal benefit as this is static data not going to change anytime soon.
 -   Send a command to the device to 'force' it into scan/measure more
     when it is in a config menu.
+A: Feasible but difficult to achieve/guarantee in all cases.
 -   Special commend to set the device in remote measure mode
     during which the screen goes blank/unlit and/or keys get blocked.
+A: This is in my todo list.
 -   discover RBW from a C#
+A: Agreed, will populate this in a C2-F revision.
 
